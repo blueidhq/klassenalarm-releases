@@ -1,0 +1,46 @@
+name: Update download pages
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-download-pages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Update current downloads
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node .github/scripts/update-downloads.mjs
+
+      - name: Validate generated files
+        run: |
+          node --test .github/scripts/update-downloads.test.mjs
+          git diff --check
+
+      - name: Commit changed download links
+        run: |
+          if git diff --quiet; then
+            echo "Download pages are already current."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md windows/README.md android/README.md downloads.json
+          git commit -m "Update current download links"
+          git push origin main
