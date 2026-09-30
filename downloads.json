@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-22T14:24:30Z",
+  "updatedAt": "2026-09-30T17:36:10Z",
   "windows": {
     "version": "1.0.15.0",
     "publishedAt": "2026-09-21T16:55:20Z",
@@ -9,11 +9,11 @@
     "sha256": "eedc2fc41c2a5606adc3af0bccd7749528005df238ac5ad4bfd4d21a32895045"
   },
   "android": {
-    "version": "5.2.0",
-    "publishedAt": "2026-09-22T14:24:30Z",
-    "fileName": "klassenalarm-5.2.0.apk",
-    "downloadUrl": "https://github.com/blueidhq/klassenalarm-releases/releases/download/android/5.2.0/klassenalarm-5.2.0.apk",
-    "releaseUrl": "https://github.com/blueidhq/klassenalarm-releases/releases/tag/android/5.2.0",
-    "sha256": "ab34b1b3163b7213b33b25b5188c07999ee96df2dd1ea7158c3a65df23f58ad6"
+    "version": "5.2.1",
+    "publishedAt": "2026-09-30T17:36:10Z",
+    "fileName": "klassenalarm-5.2.1.apk",
+    "downloadUrl": "https://github.com/blueidhq/klassenalarm-releases/releases/download/android/5.2.1/klassenalarm-5.2.1.apk",
+    "releaseUrl": "https://github.com/blueidhq/klassenalarm-releases/releases/tag/android/5.2.1",
+    "sha256": "8e741f00809ffe1285b332f59035cc0aa342d7bd1cc8a73c7b0fc03b0093a291"
   }
 }

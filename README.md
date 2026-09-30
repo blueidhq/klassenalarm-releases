@@ -13,7 +13,7 @@ Diese beiden Adressen bleiben gleich. Nach einer neuen Veröffentlichung aktuali
 | Plattform | Version | Veröffentlicht | Installationsdatei |
 | --- | --- | --- | --- |
 | Windows | 1.0.15.0 | 21.09.2026 | [Windows-Setup herunterladen](https://github.com/blueidhq/klassenalarm-releases/releases/download/windows/1.0.15.0/Klassenalarm-Setup-1.0.15.0.exe) |
-| Android | 5.2.0 | 22.09.2026 | [Android-App herunterladen](https://github.com/blueidhq/klassenalarm-releases/releases/download/android/5.2.0/klassenalarm-5.2.0.apk) |
+| Android | 5.2.1 | 30.09.2026 | [Android-App herunterladen](https://github.com/blueidhq/klassenalarm-releases/releases/download/android/5.2.1/klassenalarm-5.2.1.apk) |
 <!-- downloads:end -->
 
 ## Installation
