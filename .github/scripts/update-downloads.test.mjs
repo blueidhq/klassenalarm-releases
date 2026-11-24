@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   compareVersions,
   platforms,
+  renderPlatformBlock,
   replaceGeneratedBlock,
   selectCurrentRelease,
 } from "./update-downloads.mjs";
@@ -46,6 +47,24 @@ test("ignores legacy Android tags without the platform prefix", () => {
   ];
 
   assert.equal(selectCurrentRelease(releases, platforms.android).version, "5.2.0");
+});
+
+test("links directly to each Windows asset from the selected release", () => {
+  const previous = release("windows/1.0.15.0", { assets: ["setup.exe", "previous.msixbundle"] });
+  const current = release("windows/1.0.16.0", {
+    assets: ["setup.exe", "current.msixbundle", "klassenalarm-windows-1.0.16.0.zip"],
+  });
+
+  const block = renderPlatformBlock(selectCurrentRelease([previous, current], platforms.windows), platforms.windows);
+  assert.match(block, /\[Windows-Setup herunterladen\]\(https:\/\/example\.invalid\/setup\.exe\)/);
+  assert.match(block, /\[MSIX-Bundle herunterladen\]\(https:\/\/example\.invalid\/current\.msixbundle\)/);
+  assert.match(block, /\(https:\/\/example\.invalid\/klassenalarm-windows-1\.0\.16\.0\.zip\)/);
+  assert.doesNotMatch(block, /previous\.msixbundle/);
+
+  current.assets.splice(1, 1);
+  const blockWithoutBundle = renderPlatformBlock(selectCurrentRelease([previous, current], platforms.windows), platforms.windows);
+  assert.match(blockWithoutBundle, /## Version 1\.0\.16\.0/);
+  assert.doesNotMatch(blockWithoutBundle, /msixbundle/i);
 });
 
 test("replaces only the generated block", () => {

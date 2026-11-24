@@ -1,6 +1,6 @@
 # Klassenalarm für Windows
 
-Auf dieser Seite finden Sie die aktuelle Windows-Version von Klassenalarm. Die Adresse dieser Seite bleibt auch nach neuen Veröffentlichungen gleich.
+Hier finden Sie die aktuelle Version von Klassenalarm für Windows-PCs mit x64-Prozessor. Für die Installation brauchen Sie keinen Zugriff auf den Microsoft Store.
 
 <!-- download:start -->
 ## Version 1.0.15.0
@@ -9,13 +9,34 @@ Veröffentlicht am 21.09.2026
 
 [Windows-Setup herunterladen](https://github.com/blueidhq/klassenalarm-releases/releases/download/windows/1.0.15.0/Klassenalarm-Setup-1.0.15.0.exe)
 
-[Alle Dateien und Angaben zu dieser Version ansehen](https://github.com/blueidhq/klassenalarm-releases/releases/tag/windows/1.0.15.0)
+[MSIX-Bundle herunterladen](https://github.com/blueidhq/klassenalarm-releases/releases/download/windows/1.0.15.0/klassenalarm_1.0.15.0_x64.msixbundle)
+
+[Windows-Paket mit Zertifikat und Abhängigkeiten herunterladen (ZIP)](https://github.com/blueidhq/klassenalarm-releases/releases/download/windows/1.0.15.0/klassenalarm-windows-1.0.15.0.zip)
 <!-- download:end -->
 
-## Installation
+## Installation mit dem Windows-Setup
 
-Laden Sie das Windows-Setup herunter, öffnen Sie die EXE-Datei und folgen Sie den angezeigten Installationsschritten.
+1. Laden Sie das Windows-Setup herunter und öffnen Sie die EXE-Datei in dem Windows-Konto, mit dem Sie Klassenalarm nutzen möchten.
+2. Folgen Sie dem Setup. Windows fordert für den Import des Signaturzertifikats Administratorrechte an. Auf einem verwalteten Gerät kann Ihre IT diesen Schritt übernehmen.
+3. Öffnen Sie nach der Installation Klassenalarm im Startmenü.
 
-Die von GitHub zusätzlich angebotenen Archive mit der Bezeichnung „Source code“ sind keine Installationsdateien.
+Das Setup bringt die Windows-Abhängigkeiten mit und installiert sie zusammen mit Klassenalarm.
+
+## Installation des MSIX-Bundles durch die IT
+
+Das MSIX-Bundle lässt sich einzeln installieren, wenn Windows dem Klassenalarm-Signaturzertifikat bereits vertraut und die passenden Laufzeitpakete vorhanden sind. Für die Ersteinrichtung enthält das ZIP alle benötigten Dateien.
+
+1. Laden Sie das Windows-Paket als ZIP herunter und entpacken Sie es.
+2. Erlauben Sie auf den Zielgeräten die Installation vertrauenswürdiger App-Pakete außerhalb des Stores. Stellen Sie das mitgelieferte `.cer`-Zertifikat im Zertifikatspeicher **Vertrauenswürdige Personen** des lokalen Computers bereit. [Microsoft-Anleitung zur Installation außerhalb des Stores](https://learn.microsoft.com/de-de/windows/application-management/sideload-apps-in-windows)
+3. Öffnen Sie Windows PowerShell im entpackten Ordner unter dem Windows-Konto, das Klassenalarm verwenden soll. Installieren Sie das Bundle zusammen mit den Laufzeitpaketen aus `Dependencies\x64`.
+
+   ```powershell
+   $bundle = Get-ChildItem -Filter '*.msixbundle' -File
+   $dependencies = Get-ChildItem -LiteralPath '.\Dependencies\x64' -File |
+       Where-Object { $_.Extension -in '.appx', '.msix' }
+   Add-AppxPackage -Path $bundle.FullName -DependencyPath $dependencies.FullName
+   ```
+
+4. Prüfen Sie, ob sich Klassenalarm über das Startmenü im vorgesehenen Windows-Konto öffnen lässt.
 
 Wenn Sie Unterstützung bei der Installation benötigen, wenden Sie sich bitte an Ihre Klassenalarm-Ansprechperson.

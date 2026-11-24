@@ -11,6 +11,10 @@ export const platforms = {
     assetPattern: /\.exe$/i,
     linkLabel: "Windows-Setup herunterladen",
     pagePath: "windows/README.md",
+    additionalDownloads: [
+      { assetPattern: /\.msixbundle$/i, linkLabel: "MSIX-Bundle herunterladen" },
+      { assetPattern: /^klassenalarm-windows-[\d.]+\.zip$/i, linkLabel: "Windows-Paket mit Zertifikat und Abhängigkeiten herunterladen (ZIP)" },
+    ],
   },
   android: {
     label: "Android",
@@ -77,16 +81,25 @@ function renderMainTable(current) {
   ].join("\n");
 }
 
-function renderPlatformBlock(item, platform) {
+export function renderPlatformBlock(item, platform) {
+  const links = [`[${platform.linkLabel}](${item.asset.browser_download_url})`];
+
+  if (platform.additionalDownloads) {
+    for (const { assetPattern, linkLabel } of platform.additionalDownloads) {
+      const assets = item.release.assets.filter((asset) => assetPattern.test(asset.name));
+      if (assets.length === 1) {
+        links.push(`[${linkLabel}](${assets[0].browser_download_url})`);
+      }
+    }
+  } else {
+    links.push(`[Alle Dateien und Angaben zu dieser Version ansehen](${releaseUrl(item.release.tag_name)})`);
+  }
+
   return [
     `## Version ${item.version}`,
-    "",
     `Veröffentlicht am ${formatDate(item.release.published_at)}`,
-    "",
-    `[${platform.linkLabel}](${item.asset.browser_download_url})`,
-    "",
-    `[Alle Dateien und Angaben zu dieser Version ansehen](${releaseUrl(item.release.tag_name)})`,
-  ].join("\n");
+    ...links,
+  ].join("\n\n");
 }
 
 export function replaceGeneratedBlock(content, marker, replacement) {
