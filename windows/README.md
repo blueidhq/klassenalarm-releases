@@ -16,8 +16,11 @@ Veröffentlicht am 21.09.2026
 
 ## Installation mit dem Windows-Setup
 
+> [!IMPORTANT]
+> Für den Import des Signaturzertifikats benötigt das Windows-Setup Administratorrechte. Wenn Sie die Windows-Abfrage auf Ihrem Gerät nicht bestätigen können, wenden Sie sich für die Installation an Ihre IT.
+
 1. Laden Sie das Windows-Setup herunter und öffnen Sie die EXE-Datei in dem Windows-Konto, mit dem Sie Klassenalarm nutzen möchten.
-2. Folgen Sie dem Setup. Windows fordert für den Import des Signaturzertifikats Administratorrechte an. Auf einem verwalteten Gerät kann Ihre IT diesen Schritt übernehmen.
+2. Folgen Sie den Schritten im Setup.
 3. Öffnen Sie nach der Installation Klassenalarm im Startmenü.
 
 Das Setup bringt die Windows-Abhängigkeiten mit und installiert sie zusammen mit Klassenalarm.
@@ -38,5 +41,9 @@ Das MSIX-Bundle lässt sich einzeln installieren, wenn Windows dem Klassenalarm-
    ```
 
 4. Prüfen Sie, ob sich Klassenalarm über das Startmenü im vorgesehenen Windows-Konto öffnen lässt.
+
+## Warum Windows das Signaturzertifikat braucht
+
+Windows prüft anhand der digitalen Signatur, wer das MSIX-Paket signiert hat und ob es seitdem verändert wurde. BlueID signiert das Paket mit einem selbstsignierten Zertifikat. Damit Windows bei der Installation außerhalb des Microsoft Stores diese Signatur akzeptiert, muss der Computer dem Zertifikat vertrauen. Das Setup importiert es automatisch nach der Administratorfreigabe. Bei der zentralen Verteilung kann Ihre IT das Zertifikat vorab auf den Zielgeräten hinterlegen.
 
 Wenn Sie Unterstützung bei der Installation benötigen, wenden Sie sich bitte an Ihre Klassenalarm-Ansprechperson.
