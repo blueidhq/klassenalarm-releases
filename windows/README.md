@@ -31,7 +31,8 @@ Laden Sie für die Ersteinrichtung das Windows-Paket als ZIP herunter und entpac
 
 ### Zertifikat als vertrauenswürdig hinterlegen
 
-Wenn Windows dem Klassenalarm-Zertifikat noch nicht vertraut, importieren Sie es vor der MSIX-Installation. Für diesen Schritt sind Administratorrechte erforderlich.
+> [!IMPORTANT]
+> Bei der Erstinstallation muss das Zertifikat einmal pro Gerät mit Administratorrechten hinterlegt werden, sofern Windows ihm noch nicht vertraut. Updates mit demselben Zertifikat nutzen den vorhandenen Eintrag.
 
 1. Öffnen Sie im Startmenü **Windows PowerShell** über **Als Administrator ausführen**. Wechseln Sie mit `Set-Location` in den entpackten Ordner.
 2. Importieren Sie `klassenalarm-prod-signing.cer` in den Zertifikatspeicher **Vertrauenswürdige Personen** des lokalen Computers.
