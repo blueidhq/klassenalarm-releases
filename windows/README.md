@@ -25,6 +25,10 @@ Veröffentlicht am 21.09.2026
 
 Das Setup importiert das Zertifikat und installiert Klassenalarm samt Windows-Abhängigkeiten. Damit ist die Installation abgeschlossen.
 
+## Verteilung über Microsoft Intune
+
+Für zentral verwaltete Geräte enthält das Intune-Paket eine fertige `.intunewin`-Datei. Laden Sie diese als Windows-App (Win32) in Intune hoch. Als Erkennungsregel verwenden Sie `Paket\Detect-Klassenalarm.ps1` aus demselben ZIP. Die Befehle für Installation und Deinstallation sowie die Einstellungen für die Zuweisung finden Sie in der [Intune-Anleitung](intune/README.md).
+
 ## Installation des MSIX-Bundles durch die IT
 
 Laden Sie für die Ersteinrichtung das Windows-Paket als ZIP herunter und entpacken Sie es. Es enthält das MSIX-Bundle, das Signaturzertifikat und die Windows-Abhängigkeiten. Wenn Windows dem Zertifikat bereits vertraut und die passenden Laufzeitpakete installiert sind, genügt das einzelne MSIX-Bundle.

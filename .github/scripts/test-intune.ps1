@@ -30,12 +30,14 @@ function Test-Detection($expectedExit) {
     if ($LASTEXITCODE -ne $expectedExit -or [bool]$output -ne ($expectedExit -eq 0)) {
         throw "Unexpected detection result (expected $expectedExit, got $LASTEXITCODE): $output"
     }
+    Write-Host "Detection returned $expectedExit with the expected output."
 }
 
 function Test-SystemCommand($command, $expectedExit = 0) {
     # Intune launches Win32 commands from a 32-bit process as LocalSystem.
-    $action = New-ScheduledTaskAction -Execute "$env:SystemRoot\SysWOW64\cmd.exe" -Argument "/d /c Deploy.cmd $command" -WorkingDirectory $Payload
     $name = "Klassenalarm-CI-$([guid]::NewGuid())"
+    $log = Join-Path $env:RUNNER_TEMP "$name.log"
+    $action = New-ScheduledTaskAction -Execute "$env:SystemRoot\SysWOW64\cmd.exe" -Argument "/d /c Deploy.cmd $command > `"$log`" 2>&1" -WorkingDirectory $Payload
     Register-ScheduledTask -TaskName $name -User 'SYSTEM' -RunLevel Highest -Action $action | Out-Null
     try {
         Start-ScheduledTask -TaskName $name
@@ -46,9 +48,11 @@ function Test-SystemCommand($command, $expectedExit = 0) {
             $state = (Get-ScheduledTask -TaskName $name).State
             if ((Get-Date) -gt $deadline) { throw "$command timed out" }
         } until ($state -eq 'Ready' -and $info.LastRunTime.Year -gt 2000)
+        if (Test-Path $log) { Get-Content -LiteralPath $log | Write-Host }
         if ($info.LastTaskResult -ne $expectedExit) {
             throw "$command returned $($info.LastTaskResult), expected $expectedExit"
         }
+        Write-Host "SYSTEM $command returned $expectedExit."
     } finally {
         Unregister-ScheduledTask -TaskName $name -Confirm:$false
     }
@@ -78,3 +82,5 @@ Test-SystemCommand 'uninstall'
 if (-not (Test-Path "Cert:\LocalMachine\TrustedPeople\$($certificate.Thumbprint)")) {
     throw 'Uninstall removed the shared signing certificate.'
 }
+# The final negative detection is expected to exit 1. Return the suite result to CI.
+exit 0
