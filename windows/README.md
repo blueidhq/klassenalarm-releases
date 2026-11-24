@@ -23,29 +23,29 @@ Veröffentlicht am 21.09.2026
 2. Folgen Sie den Schritten im Setup.
 3. Öffnen Sie nach der Installation Klassenalarm im Startmenü.
 
-Das Setup bringt die Windows-Abhängigkeiten mit und installiert sie zusammen mit Klassenalarm.
+Das Setup importiert das Zertifikat und installiert Klassenalarm samt Windows-Abhängigkeiten. Damit ist die Installation abgeschlossen.
 
-## MSIX-Signaturzertifikat hinterlegen
+## Installation des MSIX-Bundles durch die IT
+
+Laden Sie für die Ersteinrichtung das Windows-Paket als ZIP herunter und entpacken Sie es. Es enthält das MSIX-Bundle, das Signaturzertifikat und die Windows-Abhängigkeiten. Wenn Windows dem Zertifikat bereits vertraut und die passenden Laufzeitpakete installiert sind, genügt das einzelne MSIX-Bundle.
+
+### Zertifikat als vertrauenswürdig hinterlegen
 
 Wenn Windows dem Klassenalarm-Zertifikat noch nicht vertraut, importieren Sie es vor der MSIX-Installation. Für diesen Schritt sind Administratorrechte erforderlich.
 
-1. Laden Sie das Windows-Paket als ZIP herunter und entpacken Sie es. Der entpackte Ordner enthält die Datei `klassenalarm-prod-signing.cer`.
-2. Öffnen Sie im Startmenü **Windows PowerShell** über **Als Administrator ausführen**. Wechseln Sie mit `Set-Location` in den entpackten Ordner.
-3. Importieren Sie das Zertifikat in den Zertifikatspeicher **Vertrauenswürdige Personen** des lokalen Computers.
+1. Öffnen Sie im Startmenü **Windows PowerShell** über **Als Administrator ausführen**. Wechseln Sie mit `Set-Location` in den entpackten Ordner.
+2. Importieren Sie `klassenalarm-prod-signing.cer` in den Zertifikatspeicher **Vertrauenswürdige Personen** des lokalen Computers.
 
    ```powershell
    Import-Certificate -FilePath '.\klassenalarm-prod-signing.cer' -CertStoreLocation 'Cert:\LocalMachine\TrustedPeople'
    ```
 
-4. Schließen Sie nach dem erfolgreichen Import das Administratorfenster und fahren Sie mit der MSIX-Installation fort.
+3. Schließen Sie nach dem erfolgreichen Import das Administratorfenster.
 
-## Installation des MSIX-Bundles durch die IT
+### App und Abhängigkeiten installieren
 
-Das MSIX-Bundle lässt sich einzeln installieren, wenn Windows dem Klassenalarm-Signaturzertifikat bereits vertraut und die passenden Laufzeitpakete vorhanden sind. Für die Ersteinrichtung enthält das ZIP alle benötigten Dateien.
-
-1. Verwenden Sie den entpackten Ordner des Windows-Pakets (ZIP).
-2. Stellen Sie sicher, dass die Zielgeräte die Installation vertrauenswürdiger App-Pakete außerhalb des Stores zulassen. [Microsoft-Anleitung zur Installation außerhalb des Stores](https://learn.microsoft.com/de-de/windows/application-management/sideload-apps-in-windows)
-3. Öffnen Sie Windows PowerShell im entpackten Ordner unter dem Windows-Konto, das Klassenalarm verwenden soll. Installieren Sie das Bundle zusammen mit den Laufzeitpaketen aus `Dependencies\x64`.
+1. Stellen Sie sicher, dass die Zielgeräte die Installation vertrauenswürdiger App-Pakete außerhalb des Stores zulassen. [Microsoft-Anleitung zur Installation außerhalb des Stores](https://learn.microsoft.com/de-de/windows/application-management/sideload-apps-in-windows)
+2. Öffnen Sie Windows PowerShell im entpackten Ordner unter dem Windows-Konto, das Klassenalarm verwenden soll. Installieren Sie das Bundle zusammen mit den Laufzeitpaketen aus `Dependencies\x64`.
 
    ```powershell
    $bundle = Get-ChildItem -Filter '*.msixbundle' -File
@@ -54,7 +54,7 @@ Das MSIX-Bundle lässt sich einzeln installieren, wenn Windows dem Klassenalarm-
    Add-AppxPackage -Path $bundle.FullName -DependencyPath $dependencies.FullName
    ```
 
-4. Prüfen Sie, ob sich Klassenalarm über das Startmenü im vorgesehenen Windows-Konto öffnen lässt.
+3. Prüfen Sie, ob sich Klassenalarm über das Startmenü im vorgesehenen Windows-Konto öffnen lässt.
 
 ## Warum Windows das MSIX-Signaturzertifikat braucht
 
