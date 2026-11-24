@@ -25,12 +25,26 @@ Veröffentlicht am 21.09.2026
 
 Das Setup bringt die Windows-Abhängigkeiten mit und installiert sie zusammen mit Klassenalarm.
 
+## MSIX-Signaturzertifikat hinterlegen
+
+Wenn Windows dem Klassenalarm-Zertifikat noch nicht vertraut, importieren Sie es vor der MSIX-Installation. Für diesen Schritt sind Administratorrechte erforderlich.
+
+1. Laden Sie das Windows-Paket als ZIP herunter und entpacken Sie es. Der entpackte Ordner enthält die Datei `klassenalarm-prod-signing.cer`.
+2. Öffnen Sie im Startmenü **Windows PowerShell** über **Als Administrator ausführen**. Wechseln Sie mit `Set-Location` in den entpackten Ordner.
+3. Importieren Sie das Zertifikat in den Zertifikatspeicher **Vertrauenswürdige Personen** des lokalen Computers.
+
+   ```powershell
+   Import-Certificate -FilePath '.\klassenalarm-prod-signing.cer' -CertStoreLocation 'Cert:\LocalMachine\TrustedPeople'
+   ```
+
+4. Schließen Sie nach dem erfolgreichen Import das Administratorfenster und fahren Sie mit der MSIX-Installation fort.
+
 ## Installation des MSIX-Bundles durch die IT
 
 Das MSIX-Bundle lässt sich einzeln installieren, wenn Windows dem Klassenalarm-Signaturzertifikat bereits vertraut und die passenden Laufzeitpakete vorhanden sind. Für die Ersteinrichtung enthält das ZIP alle benötigten Dateien.
 
-1. Laden Sie das Windows-Paket als ZIP herunter und entpacken Sie es.
-2. Erlauben Sie auf den Zielgeräten die Installation vertrauenswürdiger App-Pakete außerhalb des Stores. Stellen Sie das mitgelieferte `.cer`-Zertifikat im Zertifikatspeicher **Vertrauenswürdige Personen** des lokalen Computers bereit. [Microsoft-Anleitung zur Installation außerhalb des Stores](https://learn.microsoft.com/de-de/windows/application-management/sideload-apps-in-windows)
+1. Verwenden Sie den entpackten Ordner des Windows-Pakets (ZIP).
+2. Stellen Sie sicher, dass die Zielgeräte die Installation vertrauenswürdiger App-Pakete außerhalb des Stores zulassen. [Microsoft-Anleitung zur Installation außerhalb des Stores](https://learn.microsoft.com/de-de/windows/application-management/sideload-apps-in-windows)
 3. Öffnen Sie Windows PowerShell im entpackten Ordner unter dem Windows-Konto, das Klassenalarm verwenden soll. Installieren Sie das Bundle zusammen mit den Laufzeitpaketen aus `Dependencies\x64`.
 
    ```powershell
