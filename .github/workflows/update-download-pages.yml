@@ -5,6 +5,11 @@ on:
     types:
       - published
   workflow_dispatch:
+    inputs:
+      windows_version:
+        description: "Build the Intune kit for an existing Windows release (e.g. 1.0.15.0)"
+        type: string
+        required: false
 
 permissions:
   contents: write
@@ -14,13 +19,85 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  windows-intune:
+    if: ${{ inputs.windows_version != '' || (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'windows/') && !github.event.release.prerelease) }}
+    runs-on: windows-2025
+    permissions:
+      contents: read
+    env:
+      WINDOWS_TAG: ${{ github.event.release.tag_name }}
+      REQUESTED_VERSION: ${{ inputs.windows_version }}
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'release' && 'main' || github.ref }}
+          persist-credentials: false
+      - name: Prepare the published Windows payload
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = $env:REQUESTED_VERSION
+          if (-not $version) { $version = $env:WINDOWS_TAG -replace '^windows/', '' }
+          if ($version -notmatch '^\d+\.\d+\.\d+\.\d+$') { throw 'Invalid Windows release version' }
+          $name = "klassenalarm-windows-$version.zip"
+          $release = gh release view "windows/$version" --json assets,isDraft,isPrerelease | ConvertFrom-Json
+          if ($release.isDraft -or $release.isPrerelease) { throw 'Expected a stable, published release.' }
+          $asset = $release.assets | Where-Object name -eq $name
+          gh release download "windows/$version" --pattern $name
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ("sha256:$((Get-FileHash $name -Algorithm SHA256).Hash)" -ne $asset.digest) { throw 'Release ZIP digest mismatch.' }
+          "KIT_NAME=klassenalarm-intune-$version.zip" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          python .github/scripts/prepare-intune.py $name $version kit
+      - name: Test installation, detection and removal on Windows
+        run: ./.github/scripts/test-intune.ps1 -Payload kit/Paket
+      - name: Build the Intune upload and administrator ZIP
+        run: |
+          $tool = Join-Path $env:RUNNER_TEMP 'IntuneWinAppUtil.exe'
+          Invoke-WebRequest -UseBasicParsing -OutFile $tool -Uri 'https://raw.githubusercontent.com/microsoft/Microsoft-Win32-Content-Prep-Tool/1d6cfcbdf8c28edc596337031f74df951f38f718/IntuneWinAppUtil.exe'
+          if ((Get-FileHash $tool).Hash -ne 'c1ba45b5cb939e84af064bb7ff4b38fb3dfe33c8dc1078fd9b157672eae671f6') { throw 'Content Prep Tool digest mismatch.' }
+          & $tool -c kit/Paket -s Deploy.cmd -o kit -q
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Move-Item kit/Deploy.intunewin kit/Klassenalarm.intunewin
+          Compress-Archive -Path kit/* -DestinationPath $env:KIT_NAME
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-intune
+          path: klassenalarm-intune-*.zip
+          if-no-files-found: error
+
   update:
+    needs: windows-intune
+    if: ${{ !cancelled() && (github.event_name == 'release' || github.ref == 'refs/heads/main') }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out main
         uses: actions/checkout@v4
         with:
           ref: main
+
+      - uses: actions/download-artifact@v4
+        if: needs.windows-intune.result == 'success'
+        with:
+          name: windows-intune
+          path: ${{ runner.temp }}/intune
+
+      - name: Attach the verified Intune kit
+        if: needs.windows-intune.result == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          kits=("$RUNNER_TEMP"/intune/klassenalarm-intune-*.zip)
+          name=$(basename "${kits[0]}")
+          [[ "$name" =~ ^klassenalarm-intune-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.zip$ ]]
+          tag="windows/${BASH_REMATCH[1]}"
+          existing=$(gh release view "$tag" --json assets --jq '.assets[].name')
+          if ! grep -Fxq "$name" <<< "$existing"; then
+            gh release upload "$tag" "${kits[0]}"
+          fi
 
       - name: Update current downloads
         env:

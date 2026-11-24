@@ -14,6 +14,7 @@ export const platforms = {
     additionalDownloads: [
       { assetPattern: /\.msixbundle$/i, linkLabel: "MSIX-Bundle herunterladen" },
       { assetPattern: /^klassenalarm-windows-[\d.]+\.zip$/i, linkLabel: "Windows-Paket mit Zertifikat und Abhängigkeiten herunterladen (ZIP)" },
+      { assetPattern: /^klassenalarm-intune-[\d.]+\.zip$/i, linkLabel: "Intune-Paket mit Skripten und Anleitung herunterladen (ZIP)" },
     ],
   },
   android: {

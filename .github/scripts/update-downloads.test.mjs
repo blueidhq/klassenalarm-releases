@@ -52,7 +52,7 @@ test("ignores legacy Android tags without the platform prefix", () => {
 test("links directly to each Windows asset from the selected release", () => {
   const previous = release("windows/1.0.15.0", { assets: ["setup.exe", "previous.msixbundle"] });
   const current = release("windows/1.0.16.0", {
-    assets: ["setup.exe", "current.msixbundle", "klassenalarm-windows-1.0.16.0.zip"],
+    assets: ["setup.exe", "current.msixbundle", "klassenalarm-windows-1.0.16.0.zip", "klassenalarm-intune-1.0.16.0.zip"],
   });
 
   const block = renderPlatformBlock(selectCurrentRelease([previous, current], platforms.windows), platforms.windows);
@@ -60,6 +60,8 @@ test("links directly to each Windows asset from the selected release", () => {
   assert.match(block, /\[MSIX-Bundle herunterladen\]\(https:\/\/example\.invalid\/current\.msixbundle\)/);
   assert.match(block, /\(https:\/\/example\.invalid\/klassenalarm-windows-1\.0\.16\.0\.zip\)/);
   assert.doesNotMatch(block, /previous\.msixbundle/);
+  assert.match(block, /Intune-Paket[^\n]+\(https:\/\/example\.invalid\/klassenalarm-intune-1\.0\.16\.0\.zip\)/);
+  assert.doesNotMatch(renderPlatformBlock(selectCurrentRelease([previous], platforms.windows), platforms.windows), /Intune-Paket/);
 
   current.assets.splice(1, 1);
   const blockWithoutBundle = renderPlatformBlock(selectCurrentRelease([previous, current], platforms.windows), platforms.windows);

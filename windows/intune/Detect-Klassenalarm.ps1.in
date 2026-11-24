@@ -1,0 +1,17 @@
+# Intune uploads this script separately. It must work without the install payload.
+$ErrorActionPreference = 'Stop'
+try {
+    $minimumVersion = [version]'@VERSION@'
+    $installed = Get-AppxProvisionedPackage -Online | Where-Object {
+        $_.PackageName -like 'BlueID.Klassenalarm_*_frdj7vb8tmanc' -and
+        [version]$_.Version -ge $minimumVersion
+    }
+    if ($installed) {
+        Write-Output "Klassenalarm provisioned: $($installed.PackageName -join ', ')"
+        exit 0
+    }
+    exit 1
+} catch {
+    [Console]::Error.WriteLine("Cannot query provisioned packages: $_")
+    exit 2
+}
