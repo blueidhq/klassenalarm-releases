@@ -12,6 +12,8 @@ Veröffentlicht am 21.09.2026
 [MSIX-Bundle herunterladen](https://github.com/blueidhq/klassenalarm-releases/releases/download/windows/1.0.15.0/klassenalarm_1.0.15.0_x64.msixbundle)
 
 [Windows-Paket mit Zertifikat und Abhängigkeiten herunterladen (ZIP)](https://github.com/blueidhq/klassenalarm-releases/releases/download/windows/1.0.15.0/klassenalarm-windows-1.0.15.0.zip)
+
+[Intune-Paket mit Skripten und Anleitung herunterladen (ZIP)](https://github.com/blueidhq/klassenalarm-releases/releases/download/windows/1.0.15.0/klassenalarm-intune-1.0.15.0.zip)
 <!-- download:end -->
 
 ## Installation mit dem Windows-Setup
